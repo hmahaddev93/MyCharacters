@@ -11,35 +11,36 @@ import CoreData
 struct ListingsView: View {
 
     @ObservedObject var viewModel:ListingsViewModel = ListingsViewModel()
+    @State private var query: String = ""
 
     var body: some View {
         NavigationView {
-            List {
-                ForEach(viewModel.characters, id: \.name) { item in
-                    NavigationLink {
-                        Text(item.name)
-                    } label: {
-                        Text(item.name)
+            VStack {
+                SearchBar(text: $query, onTextChanged: viewModel.filterBy(query:))
+                List {
+                    ForEach(viewModel.characters, id: \.name) { character in
+                        NavigationLink {
+                            CharacterDetailView(character: character)
+                        } label: {
+                            HStack {
+                                ImageView(url: character.image, width: 80, height: 80)
+                                    .cornerRadius(4)
+                                    .offset(x: 0, y: 0)
+                                    
+                                Text(character.name)
+                            }
+                        }
                     }
                 }
             }
+            .listStyle(.plain)
+            .navigationBarTitle("")
+            .navigationBarHidden(true)
             .onAppear(perform: {
                 viewModel.fetchCharacters()
             })
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-//                ToolbarItem {
-//                    Button(action: ) {
-//                        Label("Add Item", systemImage: "plus")
-//                    }
-//                }
-            }
-            Text("Select an item")
         }
     }
-
 }
 
 private let itemFormatter: DateFormatter = {
